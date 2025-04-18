@@ -1,0 +1,78 @@
+﻿body {
+    margin: 0;
+    padding: 0;
+    background-image: url(Images/BG_Pic.jpg);
+    background-size: cover;
+    font-family: sans-serif;
+}
+
+.loginbox {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 300px;
+    height: 350px;
+    padding: 80px 40px;
+    box-sizing: border-box;
+    background: rgb(0,0,0,.1);
+    border-style: dotted;
+    border-color: whitesmoke;
+}
+
+.user {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    top: calc(-100px/2);
+    left: calc(31%);
+    position: absolute;
+}
+
+h2 {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    color: rgb(255,217,9);
+}
+
+.lblemail, .lblpass {
+    font-weight: bold;
+    color: #fff;
+}
+
+.txtemail, .txtpass, .btnsubmit {
+    width: 220px;
+    margin-bottom: 20px;
+}
+
+.txtemail, .txtpass {
+    border: none;
+    border-bottom: 1px solid #fff;
+    outline: none;
+    height: 40px;
+    color: #fff;
+    font-size: 16px;
+    background-color: transparent;
+}
+
+::placeholder {
+    color: rgba(255,255,255,.5);
+}
+
+.btnsubmit {
+    border: none;
+    outline: none;
+    height: 25px;
+    font-size: 16px;
+    color: white;
+    background-color: darkblue;
+    border-color: white;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: .3s ease-in-out;
+}
+
+    .btnsubmit:hover {
+        background-color: rgb(255,217,9);
+    }
