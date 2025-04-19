@@ -152,7 +152,7 @@
          
         <div style="padding-left:100px; padding-bottom:50px" class="text-center">
         <strong>
-    <asp:GridView ID="GridView1" runat="server" BackColor="White" BorderColor="#CCCCCC" BorderStyle="None" BorderWidth="1px" CellPadding="3" CssClass="auto-style39" Width="1159px" AutoGenerateColumns="False">
+    <asp:GridView ID="GridView1" runat="server" BackColor="White" BorderColor="#CCCCCC" BorderStyle="None" BorderWidth="1px" CellPadding="3" CssClass="auto-style39" Width="998px" AutoGenerateColumns="False">
         <Columns>
             <asp:TemplateField HeaderText="Item Code">
                 <EditItemTemplate>
@@ -162,16 +162,10 @@
                     <asp:Label ID="Label1" runat="server" Text='<%# Bind("ItemCode") %>'></asp:Label>
                 </ItemTemplate>
             </asp:TemplateField>
+            <asp:BoundField DataField="RMCode" HeaderText="RM Partcode" />
             <asp:BoundField DataField="SmtLine" HeaderText="Smt Line" />
-            <asp:BoundField DataField="RmPartCode" HeaderText="RM Partcode" />
-            <asp:BoundField DataField="Qty" HeaderText="Qty" />
-            <asp:BoundField DataField="GRN" HeaderText="GRN No" />
-            <asp:BoundField DataField="LotNumber" HeaderText="LotNumber" />
-            <asp:BoundField DataField="customerName" HeaderText="Customer Name" />
-            <asp:BoundField DataField="VendorPartcode" HeaderText="Vendor Partcode" />
-            <asp:BoundField DataField="RemainQty" HeaderText="Remaining Qty" />
-            <asp:BoundField DataField="Created_Dt" HeaderText="Created Date" />
-            <asp:BoundField DataField="Created_By" HeaderText="Created By" />
+            <asp:BoundField DataField="QuantityPerUnit" HeaderText="QPS" />
+            <asp:BoundField DataField="Available_Qty" HeaderText="Available Quantity" />
         </Columns>
         <FooterStyle BackColor="White" ForeColor="#000066" />
         <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" />

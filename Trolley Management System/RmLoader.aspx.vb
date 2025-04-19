@@ -173,7 +173,10 @@ Public Class RmLoader
 
         cn.Open()
 
-        Dim cmd3 As New SqlCommand("select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' order by Created_Dt desc", cn)
+        'Dim cmd3 As New SqlCommand("select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' order by Created_Dt desc", cn)
+
+        Dim cmd3 As New SqlCommand("select ItemCode, SmtLine, RmPartCode, Sum(RemainQty) Sum_Qty from RMLoader  group by ItemCode, SmtLine, RmPartCode having ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and  RmPartCode='" + RmPartcode + "'", cn)
+
         Dim sdt3 As New SqlDataAdapter(cmd3)
         Dim dt3 As New DataTable
         sdt3.Fill(dt3)
@@ -189,16 +192,38 @@ Public Class RmLoader
 
         Else
 
-            RemainQty = Convert.ToInt32(dt3.Rows(0)(18))
+            RemainQty = Convert.ToInt32(dt3.Rows(0)(3))
 
 
             If RemainQty > 0 Then
 
-                Dim msg As String = "Remaining Quantity: " & RemainQty & " already available, you can first scrap remaining quantity and then load new"
-                Dim script = String.Format("alert('{0}');", msg)
-                ClientScript.RegisterClientScriptBlock(Me.GetType(), "alert", script, True)
+                'Dim msg As String = "Remaining Quantity: " & RemainQty & " already available, you can first scrap remaining quantity and then load new"
+                'Dim script = String.Format("alert('{0}');", msg)
+                'ClientScript.RegisterClientScriptBlock(Me.GetType(), "alert", script, True)
+
+                'Exit Sub
+
+
+                '-----Initial Entry---
+                cn.Open()
+                Dim cmd_00 As New SqlCommand("INSERT INTO RMLoader(ItemCode,SmtLine,RmPartCode,Qty,GRN,GRNDate,LotNumber,CustomerName,VendorPartCode,ExpiryDate,MfgDate,Created_Dt,Created_By,Updated_Dt,Updated_By,EntryType,PcbaNo,RemainQty,Remain_Qty_Marker)values('" & FGItemCode & "','" & SmtLine & "','" & RmPartcode & "','" & Qty & "','" & Grn & "','" & GrnDate.ToString("yyyy-MM-dd") & "','" & LotNumber & "','" & CustomerName & "','" & VendorPartcode & "','" & ExpiryDate.ToString("yyyy-MM-dd") & "','" & MfgDate.ToString("yyyy-MM-dd") & "',GETDATE(),'" & usedrid & "',GETDATE(),'" & usedrid & "','Initial','Initial Entry','" & Qty & "','Future')", cn)
+                cmd_00.ExecuteNonQuery()
+                cn.Close()
+
+                '---initial entry in RMLoader_laser---// === to optimise this query through input as discussed 9AM saturday basis asumption above insert query is alwasy top 1 for below laser insertion ====
+                cn.Open()
+                Dim cmd_11 As New SqlCommand("insert into RMLoader_Laser select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' order by Created_Dt desc", cn)
+                cmd_11.ExecuteNonQuery()
+                cn.Close()
+
+                Label1.Visible = True
+                Label1.Text = "Row Material Partcode : " & RmPartcode & " successfully loaded :" & Qty & " with Future Consumtion"
+                Label1.BackColor = System.Drawing.Color.Yellow
+                TextBox1.Text = String.Empty
+                '--------------------
 
                 Exit Sub
+
 
             End If
 
@@ -209,23 +234,23 @@ Public Class RmLoader
 
         '====================================Initial Entry (Inserting data into RMLoader table)==============================================
 
-        Dim new_remaining_qty = RemainQty + Qty
+        'Dim new_remaining_qty = RemainQty + Qty
 
         '-------updating data against null value in  RmLoader_laser table for Negative Quantity  ---------------------------------------------
 
-        cn.Open()
-        Dim cmd_u As New SqlCommand("update RMLoader_Laser set QTy='" & Qty & "', GRN='" & Grn & "',GRNDate='" & GrnDate.ToString("yyyy-MM-dd") & "',LotNumber='" & LotNumber & "',CustomerName='" & CustomerName & "',VendorPartCode='" & VendorPartcode & "',ExpiryDate='" & ExpiryDate.ToString("yyyy-MM-dd") & "',MfgDate='" & MfgDate.ToString("yyyy-MM-dd") & "',Created_Dt=GETDATE(),Created_By='" & usedrid & "',Remain_Qty_Marker='Negative_Filled'  where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' and Remain_Qty_Marker='Negative'", cn)
-        cmd_u.ExecuteNonQuery()
-        cn.Close()
+        'cn.Open()
+        'Dim cmd_u As New SqlCommand("update RMLoader_Laser set QTy='" & Qty & "', GRN='" & Grn & "',GRNDate='" & GrnDate.ToString("yyyy-MM-dd") & "',LotNumber='" & LotNumber & "',CustomerName='" & CustomerName & "',VendorPartCode='" & VendorPartcode & "',ExpiryDate='" & ExpiryDate.ToString("yyyy-MM-dd") & "',MfgDate='" & MfgDate.ToString("yyyy-MM-dd") & "',Created_Dt=GETDATE(),Created_By='" & usedrid & "',Remain_Qty_Marker='Negative_Filled'  where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' and Remain_Qty_Marker='Negative'", cn)
+        'cmd_u.ExecuteNonQuery()
+        'cn.Close()
 
 
         '-----Initial Entry---
         cn.Open()
-        Dim cmd As New SqlCommand("INSERT INTO RMLoader(ItemCode,SmtLine,RmPartCode,Qty,GRN,GRNDate,LotNumber,CustomerName,VendorPartCode,ExpiryDate,MfgDate,Created_Dt,Created_By,Updated_Dt,Updated_By,EntryType,PcbaNo,RemainQty)values('" & FGItemCode & "','" & SmtLine & "','" & RmPartcode & "','" & Qty & "','" & Grn & "','" & GrnDate.ToString("yyyy-MM-dd") & "','" & LotNumber & "','" & CustomerName & "','" & VendorPartcode & "','" & ExpiryDate.ToString("yyyy-MM-dd") & "','" & MfgDate.ToString("yyyy-MM-dd") & "',GETDATE(),'" & usedrid & "',GETDATE(),'" & usedrid & "','Initial','Initial Entry','" & new_remaining_qty & "')", cn)
+        Dim cmd As New SqlCommand("INSERT INTO RMLoader(ItemCode,SmtLine,RmPartCode,Qty,GRN,GRNDate,LotNumber,CustomerName,VendorPartCode,ExpiryDate,MfgDate,Created_Dt,Created_By,Updated_Dt,Updated_By,EntryType,PcbaNo,RemainQty,Remain_Qty_Marker)values('" & FGItemCode & "','" & SmtLine & "','" & RmPartcode & "','" & Qty & "','" & Grn & "','" & GrnDate.ToString("yyyy-MM-dd") & "','" & LotNumber & "','" & CustomerName & "','" & VendorPartcode & "','" & ExpiryDate.ToString("yyyy-MM-dd") & "','" & MfgDate.ToString("yyyy-MM-dd") & "',GETDATE(),'" & usedrid & "',GETDATE(),'" & usedrid & "','Initial','Initial Entry','" & Qty & "','Active')", cn)
         cmd.ExecuteNonQuery()
         cn.Close()
 
-        '---initial entry in RMLoader_laser-----
+        '---initial entry in RMLoader_laser---// === to optimise this query through input as discussed 9AM saturday basis asumption above insert query is alwasy top 1 for below laser insertion ====
         cn.Open()
         Dim cmd_1 As New SqlCommand("insert into RMLoader_Laser select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' order by Created_Dt desc", cn)
         cmd_1.ExecuteNonQuery()
@@ -233,10 +258,10 @@ Public Class RmLoader
 
 
         '-------Capturing loading dat in  RMLoader_History as well------
-        cn.Open()
-        Dim cmd_h As New SqlCommand("INSERT INTO RMLoader_History(ItemCode,SmtLine,RmPartCode,Qty,GRN,GRNDate,LotNumber,CustomerName,VendorPartCode,ExpiryDate,MfgDate,Created_Dt,Created_By,Updated_Dt,Updated_By,EntryType,PcbaNo,RemainQty)values('" & FGItemCode & "','" & SmtLine & "','" & RmPartcode & "','" & Qty & "','" & Grn & "','" & GrnDate.ToString("yyyy-MM-dd") & "','" & LotNumber & "','" & CustomerName & "','" & VendorPartcode & "','" & ExpiryDate.ToString("yyyy-MM-dd") & "','" & MfgDate.ToString("yyyy-MM-dd") & "',GETDATE(),'" & usedrid & "',GETDATE(),'" & usedrid & "','Initial','Initial Entry','" & new_remaining_qty & "')", cn)
-        cmd_h.ExecuteNonQuery()
-        cn.Close()
+        'cn.Open()
+        'Dim cmd_h As New SqlCommand("INSERT INTO RMLoader_History(ItemCode,SmtLine,RmPartCode,Qty,GRN,GRNDate,LotNumber,CustomerName,VendorPartCode,ExpiryDate,MfgDate,Created_Dt,Created_By,Updated_Dt,Updated_By,EntryType,PcbaNo,RemainQty)values('" & FGItemCode & "','" & SmtLine & "','" & RmPartcode & "','" & Qty & "','" & Grn & "','" & GrnDate.ToString("yyyy-MM-dd") & "','" & LotNumber & "','" & CustomerName & "','" & VendorPartcode & "','" & ExpiryDate.ToString("yyyy-MM-dd") & "','" & MfgDate.ToString("yyyy-MM-dd") & "',GETDATE(),'" & usedrid & "',GETDATE(),'" & usedrid & "','Initial','Initial Entry','" & new_remaining_qty & "')", cn)
+        'cmd_h.ExecuteNonQuery()
+        'cn.Close()
         '---------------------------------------------------------------
 
         Label1.Visible = True
@@ -307,5 +332,18 @@ Public Class RmLoader
 
     Protected Sub DropDownList2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles DropDownList2.SelectedIndexChanged
         GetGridview()
+    End Sub
+
+
+    Protected Sub GridView1_RowDataBound(sender As Object, e As GridViewRowEventArgs) Handles GridView1.RowDataBound
+        If e.Row.RowType = DataControlRowType.DataRow Then
+            ' Retrieve the value from the specific column, e.g., column index 1 (second column)
+            Dim cellValue As String = e.Row.Cells(4).Text
+
+            ' Check the value and set the background color to red if the condition is met
+            If Mid(cellValue, 1, 1) = "0" Then
+                e.Row.BackColor = System.Drawing.Color.Red
+            End If
+        End If
     End Sub
 End Class

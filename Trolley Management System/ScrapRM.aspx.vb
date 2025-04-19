@@ -103,7 +103,10 @@ Public Class ScrapRM
 
         cn.Open()
 
-        Dim cmd3 As New SqlCommand("select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' order by Created_Dt desc", cn)
+        'Dim cmd3 As New SqlCommand("select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' order by Created_Dt desc", cn)
+
+        Dim cmd3 As New SqlCommand("select top 1 * from RMLoader where ItemCode='" & FGItemCode & "' and SmtLine='" & SmtLine & "' and RmPartCode='" & RmPartcode & "' and Remain_Qty_Marker='Active' order by Created_Dt desc", cn)
+
         Dim sdt3 As New SqlDataAdapter(cmd3)
         Dim dt3 As New DataTable
         sdt3.Fill(dt3)
